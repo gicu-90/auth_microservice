@@ -1,0 +1,40 @@
+version: "3"
+volumes:
+  postgres:
+    driver: local
+services:
+    postgres:
+      image: postgres:12.0
+      volumes:
+        - postgres:/var/lib/postgresql/data/
+      environment:
+        - POSTGRES_USER=veinsplow
+        - POSTGRES_PASSWORD=LACWTDxEKzh56Urz
+        - POSTGRES_DB=auth_ms_psql
+      ports:
+        - "5432:5432"
+
+    auth_app:
+      build:
+        context: .
+      expose:
+        - "8000"
+      volumes:
+        - static_volume:/prj/drfapp/source/staticfiles
+        - .:/prj/drfapp
+      depends_on:
+        - postgres
+
+    nginx:
+      build: ./nginx
+      volumes:
+        - static_volume:/prj/drfapp/source/staticfiles
+      ports:
+        - 1337:80
+      depends_on:
+        - auth_app
+
+
+volumes:
+  static_volume:
+  postgres:
